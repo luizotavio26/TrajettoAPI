@@ -10,6 +10,7 @@ from model.cliente_model import Clientes
 from model.veiculos_model import Veiculos
 from math import floor
 
+
 class Usuarios(db.Model):
 
     __tablename__ = "Usuarios"   
