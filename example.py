@@ -3,10 +3,10 @@ import pyotp # Intalar no terminal
 
 #1.  Gerando uma chave secreta
 
-secret = pyopt.random_base32()
+secret = pyotp.random_base32()
 print(f"Secret: {secret}")
 
-totp = pyopt.TOTP(secret)
+totp = pyotp.TOTP(secret)
 
 # Gerando o codigo
 current_code = totp.now()
@@ -26,7 +26,7 @@ import hmac
 
 def get_totp_token(secret):
     missing_padding = len(secret) % 8
-    id missing_padding:
+    if missing_padding:
     secret += "=" * (8 - missing_padding)
 
     key = base64.b32decode(secret, casefold=True)

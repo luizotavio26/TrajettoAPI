@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
+from flask_mail import Mail
 
 app = Flask(__name__)
 app.config['HOST'] = '0.0.0.0'
@@ -13,6 +14,18 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 porta = app.config['PORT']
 host = app.config['HOST']
+
+#config do email
+
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'murillorod3@gmail.com'
+app.config['MAIL_PASSWORD'] = 'qwvrgulercfeayxt'
+app.config['MAIL_DEFAULT_SENDER'] = 'murillorod3@gmail.com'
+
+mail = Mail(app)
 
 # para o token
 app.config["SECRET_KEY"] = "trajetto_express"
