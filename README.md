@@ -13,8 +13,6 @@ Durante toda a construção, utilizaremos Docker para criar, implantar e executa
 
 Ana Beatriz
 
-João Pedro
-
 Luiz Otávio
 
 Murillo Rodrigues
@@ -151,5 +149,6 @@ Facilidade de implantação
     ```bash
     docker run -d -p 5036:5036 manifesto-carga-api
     ```
+
 
 
