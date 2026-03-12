@@ -1,9 +1,20 @@
 from flask import Blueprint, request, jsonify
 from model import user_model
 from model.user_model import *
+import pyotp
+from flask_mail import Message
+from config import mail
 
 cadastro_usuario_blueprint = Blueprint('cadastro_usuario', __name__)
 
+# memória temporária para OTP
+# { email: { "secret": "...", "dados": {...} } }
+otp_cache = {}
+
+
+# =========================
+# LISTAR TODOS
+# =========================
 @cadastro_usuario_blueprint.route("/usuario", methods=['GET'])
 def listarUsuarios():
     try:
@@ -13,6 +24,10 @@ def listarUsuarios():
         print(f"Erro ao listar usuarios: {e}") 
         return jsonify({'erro': str(e)}), 500
 
+
+# =========================
+# LISTAR POR ID
+# =========================
 @cadastro_usuario_blueprint.route("/usuario/<int:id_usuario>", methods=['GET'])
 def listarUsuarioId(id_usuario):
     try:
@@ -24,14 +39,85 @@ def listarUsuarioId(id_usuario):
     except Exception as e:
         return jsonify({'erro': str(e)}), 500
 
-@cadastro_usuario_blueprint.route("/usuario", methods=['POST'])
-def cadastrarUsuarios():
-    dados = request.get_json(silent=True)   
-    r, erro = user_model.postUsuario(dados)
+
+# =========================
+# GERAR OTP
+# =========================
+def gerar_otp():
+    secret = pyotp.random_base32()
+    totp = pyotp.TOTP(secret, interval=300)  # 5 minutos
+    codigo = totp.now()
+    return secret, codigo
+
+
+# =========================
+# SOLICITAR OTP (antes de cadastrar)
+# =========================
+@cadastro_usuario_blueprint.route("/usuario/solicitar-otp", methods=['POST'])
+def solicitar_otp():
+    dados = request.get_json(silent=True)
+
+    if not dados:
+        return jsonify({"erro": "Dados não enviados"}), 400
+
+    secret, otp = gerar_otp()
+
+    # guarda temporariamente
+    otp_cache[dados["email"]] = {
+        "secret": secret,
+        "dados": dados
+    }
+
+    # envia e-mail
+    msg = Message("Seu código OTP", recipients=[dados["email"]])
+    msg.body = f"""
+Olá!
+
+Seu código de verificação é: {otp}
+
+Digite este código no sistema para concluir seu cadastro.
+"""
+    mail.send(msg)
+
+    return jsonify({"mensagem": "OTP enviado para o e-mail"}), 200
+
+
+# =========================
+# CONFIRMAR OTP E CADASTRAR
+# =========================
+@cadastro_usuario_blueprint.route("/usuario/confirmar-otp", methods=['POST'])
+def confirmar_otp():
+    dados = request.get_json(silent=True)
+
+    email = dados.get("email")
+    codigo = dados.get("otp")
+
+    registro = otp_cache.get(email)
+
+    if not registro:
+        return jsonify({"erro": "Nenhum OTP solicitado para este e-mail"}), 400
+
+    totp = pyotp.TOTP(registro["secret"], interval=300)
+
+    if not totp.verify(codigo):
+        return jsonify({"erro": "OTP inválido ou expirado"}), 400
+
+    # agora cadastra de verdade
+    dados_usuario = registro["dados"]
+    r, erro = user_model.postUsuario(dados_usuario)
+
     if erro:
-        return jsonify({'erro': erro}), 400
-        
-    return jsonify({"message":"Usuário cadastrado com sucesso", "statusDB" : r}), 201
+        return jsonify({"erro": erro}), 400
+
+    # remove da memória
+    del otp_cache[email]
+
+    return jsonify({
+        "message": "Usuário cadastrado com sucesso após verificação OTP",
+        "statusDB": r
+    }), 201
+
+
 
 @cadastro_usuario_blueprint.route("/usuario/<int:id_usuario>", methods=['PUT'])
 def atualizarUsuariosId(id_usuario):
