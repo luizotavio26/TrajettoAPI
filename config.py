@@ -7,7 +7,7 @@ app.config['HOST'] = '0.0.0.0'
 app.config['PORT'] = 5036
 app.config['DEBUG'] = True
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://trajetto_04ep_user:g4ijPopj5IyvlDYBbzSb41RfXzUXtSKh@dpg-d4f6jsq4d50c73e0o980-a.oregon-postgres.render.com/trajetto_04ep"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://trajetto_gr07_user:2o2qV4lquugUQXwWzd7K9F3cNozzO1mp@dpg-d66tfi4r85hc739u4sgg-a.oregon-postgres.render.com/trajetto_gr07"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
