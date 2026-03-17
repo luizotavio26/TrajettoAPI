@@ -8,7 +8,7 @@ app.config['HOST'] = '0.0.0.0'
 app.config['PORT'] = 5036
 app.config['DEBUG'] = True
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://trajetto_gr07_user:2o2qV4lquugUQXwWzd7K9F3cNozzO1mp@dpg-d66tfi4r85hc739u4sgg-a.oregon-postgres.render.com/trajetto_gr07"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://db_trajetto_user:jJgjxrNt83kvrHjNqHobmA3485RO93qj@dpg-d6sk87aa214c73c2pbh0-a.oregon-postgres.render.com/db_trajetto"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -21,9 +21,9 @@ host = app.config['HOST']
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'murillorod3@gmail.com'
-app.config['MAIL_PASSWORD'] = 'qwvrgulercfeayxt'
-app.config['MAIL_DEFAULT_SENDER'] = 'murillorod3@gmail.com'
+app.config['MAIL_USERNAME'] = 'trajetto.contato@gmail.com'
+app.config['MAIL_PASSWORD'] = 'qnlgiytnkjpovrlg'
+app.config['MAIL_DEFAULT_SENDER'] = 'trajetto.contato@gmail.com'
 
 mail = Mail(app)
 
