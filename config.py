@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
 from flask_mail import Mail
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['HOST'] = '0.0.0.0'
@@ -15,8 +16,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 porta = app.config['PORT']
 host = app.config['HOST']
 
-#config do email
-
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "http://localhost:3000",
+            "https://SEU-FRONT.vercel.app"
+        ]
+    }
+})
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -27,7 +34,7 @@ app.config['MAIL_DEFAULT_SENDER'] = 'trajetto.contato@gmail.com'
 
 mail = Mail(app)
 
-# para o token
+
 app.config["SECRET_KEY"] = "trajetto_express"
 
 if host == "0.0.0.0":
@@ -35,6 +42,10 @@ if host == "0.0.0.0":
 
 url = f"http://{host}:{porta}"
 
-# url = "https://trajettoexpressfullstack.onrender.com"
+
 
 db = SQLAlchemy(app)
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5036)))
