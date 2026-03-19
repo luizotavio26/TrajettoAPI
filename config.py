@@ -34,7 +34,7 @@ app.config['MAIL_DEFAULT_SENDER'] = 'trajetto.contato@gmail.com'
 
 mail = Mail(app)
 
-# para o token
+
 app.config["SECRET_KEY"] = "trajetto_express"
 
 if host == "0.0.0.0":
@@ -42,7 +42,7 @@ if host == "0.0.0.0":
 
 url = f"http://{host}:{porta}"
 
-# url = "https://trajettoexpressfullstack.onrender.com"
+
 
 db = SQLAlchemy(app)
 
