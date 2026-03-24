@@ -13,8 +13,6 @@ Durante toda a construção, utilizaremos Docker para criar, implantar e executa
 
 Ana Beatriz
 
-João Pedro
-
 Luiz Otávio
 
 Murillo Rodrigues
