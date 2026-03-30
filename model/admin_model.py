@@ -10,7 +10,7 @@ from model.cliente_model import Clientes
 from model.veiculos_model import Veiculos
 from math import floor
 
-
+#Classe admin
 class Administradores(db.Model):
 
     __tablename__ = "Administradores"   
