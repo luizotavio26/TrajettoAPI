@@ -103,10 +103,6 @@ def create_motorista(motorista):
     return novo_motorista.to_dict(), None
 
 
-def read_todos_motorista():
-    motoristas  = Motoristas.query.all()   
-    return [motorista.to_dict() for motorista in motoristas], None
-
 
 def read_motorista_id(id_motorista):
     motorista = Motoristas.query.get(id_motorista)

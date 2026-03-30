@@ -11,23 +11,24 @@ from model.veiculos_model import Veiculos
 from math import floor
 
 
-class Usuarios(db.Model):
+class Administradores(db.Model):
 
-    __tablename__ = "Usuarios"   
+    __tablename__ = "Administradores"   
      
     id = db.Column(db.Integer, primary_key=True)
     nome_usuario = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(100), nullable=False, unique=True)
     senha = db.Column(db.String(50), nullable=False)
+    isAdmin = db.Column(db.Boolean, nullable=False)
 
+    '''
     motorista = db.relationship("Motoristas", back_populates="usuario")
     veiculo = db.relationship("Veiculos", back_populates="usuario")
     cliente = db.relationship("Clientes", back_populates="usuario")
     manifestos = db.relationship("ManifestoCarga", back_populates="usuario")
+    '''
     
     
-    
-
     def __init__(self, nome_usuario, email, senha):
         self.nome_usuario = nome_usuario
         self.email = email
@@ -41,73 +42,69 @@ class Usuarios(db.Model):
                 "email" : self.email,
                 "senha" : self.senha}
 
-class UsuarioNaoEncontrado(Exception):
+class AdminNaoEncontrado(Exception):
     pass
 
 class ErroValidacao(Exception):
     pass
 
+#-------------------------
+# ROTAS DA ENTIDADE ADMIN
+#-------------------------
+def getAdmin():
+    admin  = Administradores.query.all()   
+    return [admin.to_dict() for admin in admins]
 
-
-def getUsuarioId(id_usuario):
-    usuario = Usuarios.query.get(id_usuario)
-    if not usuario:
-        raise UsuarioNaoEncontrado
+def getAdminId(admin):
+    admin = Administradores.query.get(admin)
+    if not admin:
+        raise AdminNaoEncontrado
     
-    return usuario.to_dict()
+    return admin.to_dict()
 
-def putUsuarioPorId(id_usuario, dados):
-    usuario = Usuarios.query.get(id_usuario)
+def putAdminPorId(adminId, dados):
+    admin = Administradores.query.get(adminId)
 
-    if not usuario:
-        raise UsuarioNaoEncontrado
+    if not admin:
+        raise AdminoNaoEncontrado
     
-    usuario.nome_usuario = dados.get("nome_usuario", usuario.nome_usuario)
-    usuario.email = dados.get("email", usuario.email)
-    usuario.senha = dados.get("senha", usuario.senha)
+    admin.nome_usuario = dados.get("nome_usuario", admin.nome_usuario)
+    admin.email = dados.get("email", admin.email)
+    admin.senha = dados.get("senha", admin.senha)
     
     
     db.session.commit()
-    return {"message": "Usuário com ID {id_usuario} atualizado com sucesso."}
+    return {"message": "admin com ID {adminId} atualizado com sucesso."}
 
-def deleteUsuarioPorId(id_usuario):
-    usuario = Usuarios.query.get(id_usuario)
+def deleteAdminPorId(adminId):
+    admin = Administradores.query.get(adminId)
     
-    if usuario:
-        db.session.delete(usuario)
+    if admin:
+        db.session.delete(admin)
         db.session.commit()
-        return {"message":"Usuário com ID {id_usuario} deletado com sucesso."}
+        return {"message":"admin com ID {adminId} deletado com sucesso."}
     
-    return {"message":"Usuário com ID {id_usuario} não encontrado."}
+    return {"message":"admin com ID {adminId} não encontrado."}
 
-def deleteTodosUsuario():
-    usuarios = Usuarios.query.all()    
-    for usuario in usuarios:
-        db.session.delete(usuario)
-    db.session.commit()
-    return {'message':"Usuários deletados com sucesso!"}
-
-#----------------------------------------------------------------------------
-# CADASTRO E LOGIN DE USUÁRIO COM TOKEN
-#----------------------------------------------------------------------------
-def postUsuario(dados):
+# CADASTRO E LOGIN DE ADMIN COM TOKEN
+def postAdmin(dados):
     try:
-        if Usuarios.query.filter_by(email=dados.get('email')).first():
+        if Administradores.query.filter_by(email=dados.get('email')).first():
             return None, "E-mail já cadastrado no sistema."
         
-        if Usuarios.query.filter_by(nome_usuario=dados.get('nome_usuario')).first():
-            return None, "Nome de usuário não disponível"
+        if Administradores.query.filter_by(nome_usuario=dados.get('nome_usuario')).first():
+            return None, "Nome de admin não disponível"
 
-        novo_usuario = Usuarios(
+        novo_admin = Administradores(
             email = dados["email"],
             senha = dados["senha"],
             nome_usuario = dados["nome_usuario"],
         )
         
-        db.session.add(novo_usuario)
+        db.session.add(novo_admin)
         db.session.commit()
         
-        return novo_usuario.id, None
+        return novo_admin.id, None
     
     except IntegrityError as e:
         db.session.rollback()
@@ -116,7 +113,7 @@ def postUsuario(dados):
             return None, "Erro: E-mail já cadastrado no sistema."
 
         if "usuarios_nome_usuario_key" in str(e):
-            return None, "Erro: Nome de Usuário ja existe no sistema."
+            return None, "Erro: Nome de admin ja existe no sistema."
 
         return None, "Erro de integridade dos dados."
         
@@ -125,67 +122,95 @@ def postUsuario(dados):
         return None, f"Erro interno ao cadastrar: {str(e)}"
 
 def verificaSenhaEmail(dados):
-    usuario = Usuarios.query.filter_by(email=dados["email"]).first()
+    admin = Administradores.query.filter_by(email=dados["email"]).first()
 
     # SECRET_KEY
-#    SECRET_KEY = "trajetto_express"
     SECRET_KEY = "ytskryo"
 
-    if usuario.email is None:
+    if admin.email is None:
         return {"message": "registro não encontrado, faça seu cadastro"}
 
-    elif usuario.nome_usuario is None:
+    elif admin.nome_usuario is None:
         return {"message": "registro não encontrado"}
     
     else:
-        if dados["senha"] != usuario.senha:
+        if dados["senha"] != admin.senha:
             return {"message": "senha invalida"}
 
         else:
             token = jwt.encode(
-            {"email": usuario.email, 
-            "nome_usuario": usuario.nome_usuario,
-            "id_usuario": usuario.id,
+            {"email": admin.email, 
+            "nome_usuario": admin.nome_usuario,
+            "id_usuario": admin.id,
+            "isAdmin":True,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)},
             SECRET_KEY,
             algorithm="HS256"
             )
-
+            
             return ({"message": "Login realizado com sucesso", "token": token,"success": True})
 
 def esqueciSenha(dados):
-    usuario = Usuarios.query.filter_by(email=dados["email"]).first()
+    admin = Administradores.query.filter_by(email=dados["email"]).first()
 
-    if not usuario:
-        raise UsuarioNaoEncontrado
+    if not admin:
+        raise AdminNaoEncontrado
 
-    usuario.senha = dados.get("senha", usuario.senha)
+    admin.senha = dados.get("senha", admin.senha)
     db.session.commit()
 
     return {"success": True, "message": "Senha alterada com sucesso"}
 
-# ---------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------
+# ROTAS PARA ACESSAR OUTRAS ENTIDADES
+#------------------------------------------------------------------------
+def getClientes():
+    clientes  = Clientes.query.all()   
+    return [cliente.to_dict() for cliente in clientes]
+
+def read_todas_cargas():
+    cargas = ManifestoCarga.query.all()
+    print(cargas)
+    return [carga.to_dict() for carga in cargas], None
+
+def read_todos_motorista():
+    motoristas  = Motoristas.query.all()   
+    return [motorista.to_dict() for motorista in motoristas], None
+
+def getUsuarios():
+    usuarios  = Usuarios.query.all()   
+    return [usuario.to_dict() for usuario in usuarios]
+
+def getVeiculos():
+    veiculos  = Veiculos.query.all()   
+    return [v.to_dict() for v in veiculos], None 
+
+
+# -------------------------
 # ROTAS PARA O DASHBOARD
-# ---------------------------------------------------------------------------------------------------
+# -------------------------
 
-def cargasCadastradas(usuario_id):
-    quantidade_cargas = ManifestoCarga.query.filter_by(usuario_id=usuario_id).count()
-    return ({"Cargas": quantidade_cargas})
+def cargasCadastradas():
+    quantidade_cargas = ManifestoCarga.query.filter_by().count()
+    return ({"Cargas Totais": quantidade_cargas})
 
-def motoristasCadastrados(usuario_id):
-    quantidade_motoristas = Motoristas.query.filter_by(usuario_id=usuario_id).count()
-    return ({"Motoristas": quantidade_motoristas})
+def motoristasCadastrados():
+    quantidade_motoristas = Motoristas.query.filter_by().count()
+    return ({"Motoristas Totais": quantidade_motoristas})
 
-def clientesCadastrados(usuario_id):
-    quantidade_clientes = Clientes.query.filter_by(usuario_id=usuario_id).count()
-    return ({"Clientes": quantidade_clientes})
+def clientesCadastrados():
+    quantidade_clientes = Clientes.query.filter_by().count()
+    return ({"Clientes Totais": quantidade_clientes})
 
-def veiculosCadastrados(usuario_id):
-    quantidade_veiculos = Veiculos.query.filter_by(usuario_id=usuario_id).count()
-    return ({"Veiculos": quantidade_veiculos})
+def veiculosCadastrados():
+    quantidade_veiculos = Veiculos.query.filter_by().count()
+    return ({"Veiculos Totais": quantidade_veiculos})
 
-def totaisCargas(usuario_id):
-    cargas = ManifestoCarga.query.filter_by(usuario_id=usuario_id).all()
+"""
+#Acho que isso pode ser visto depois, para pedir o valor cobrado por todos os fretes
+
+def totaisCargas():
+    cargas = ManifestoCarga.query.filter_by().all()
 
     total_frete = 0
     total_km = 0
@@ -208,6 +233,7 @@ def totaisCargas(usuario_id):
                 total_km += c.distancia
 
     return {"TotalFrete": total_frete, "TotalKM": total_km}
+
 
 #funções pro calculo de faturamento
 valor_diesel = 6.06
@@ -307,4 +333,8 @@ def faturamento(usuario_id):
         "total_liquido": total_liquido,
         "detalhado": dados_faturamento
     }
+
+"""
+
+
 

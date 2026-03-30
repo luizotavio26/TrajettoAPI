@@ -11,20 +11,6 @@ cadastro_usuario_blueprint = Blueprint('cadastro_usuario', __name__)
 # { email: { "secret": "...", "dados": {...} } }
 otp_cache = {}
 
-
-# =========================
-# LISTAR TODOS
-# =========================
-@cadastro_usuario_blueprint.route("/usuario", methods=['GET'])
-def listarUsuarios():
-    try:
-        usuarios = user_model.getUsuarios()
-        return jsonify(usuarios), 200
-    except Exception as e:
-        print(f"Erro ao listar usuarios: {e}") 
-        return jsonify({'erro': str(e)}), 500
-
-
 # =========================
 # LISTAR POR ID
 # =========================

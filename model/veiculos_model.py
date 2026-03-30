@@ -41,10 +41,6 @@ class VeiculoNaoEncontrado(Exception):
     pass
 
 
-def getVeiculos():
-    veiculos  = Veiculos.query.all()   
-    return [v.to_dict() for v in veiculos], None
-
 
 def getVeiculosId(id_veiculo):
     veiculo = Veiculos.query.get(id_veiculo)

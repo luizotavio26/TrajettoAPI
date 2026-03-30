@@ -4,17 +4,6 @@ from model.cliente_model import *
 
 cadastro_clientes_blueprint = Blueprint('cadastro_clientes', __name__)
 
-
-@cadastro_clientes_blueprint.route("/clientes", methods=['GET'])
-def listarClientes():
-    try:
-        clientes = cliente_model.getClientes()
-        return jsonify(clientes), 200
-    except Exception as e:
-        print(f"Erro ao listar clientes: {e}") 
-        return jsonify({'erro': str(e)}), 500
-    
-
 @cadastro_clientes_blueprint.route("/clientes/<int:id_cliente>", methods=['GET'])
 def listarClienteId(id_cliente):
     try:

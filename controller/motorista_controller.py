@@ -19,15 +19,6 @@ def criar_motoristas():
         return jsonify({"erro": str(e)}), 500
 
 
-@motoristas_blueprint.route("/motoristas", methods=['GET'])
-def listar_motoristas():
-    try:
-        motoristas,erro = motorista_model.read_todos_motorista()
-        return jsonify(motoristas), 200
-    except Exception as e:
-        return jsonify({'erro': str(e)}), 500
-
-
 @motoristas_blueprint.route("/motoristas/<int:id_motorista>", methods=['GET'])
 def le_motoristas_id(id_motorista):
     try:

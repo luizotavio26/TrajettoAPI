@@ -198,12 +198,6 @@ def create_carga(carga):
         db.session.rollback()
         return None, str(e)
 
-    
-def read_todas_cargas():
-    cargas = ManifestoCarga.query.all()
-    print(cargas)
-    return [carga.to_dict() for carga in cargas], None
-
 
 def read_cargas_id(id_carga):
     carga = ManifestoCarga.query.get(id_carga)

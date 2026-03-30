@@ -20,15 +20,6 @@ def cria_cargas():
         return jsonify(novo_carga), 200
     except Exception as e:
         return jsonify({'erro': str(e)}), 500
- 
-
-@manifesto_cargas_blueprint.route('/cargas', methods=['GET'])
-def le_cargas():
-    try:
-        cargas,erro = manifesto_model.read_todas_cargas()
-        return jsonify(cargas), 200
-    except Exception as e:
-        return jsonify({'erro': str(e)}), 500
 
 
 @manifesto_cargas_blueprint.route('/cargas/<int:id_cargas>', methods =['GET'])
