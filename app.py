@@ -74,6 +74,10 @@ def veiculo():
 def motorista():
     return render_template("cadastro_motorista.html")
 
+@app.route("/admin")
+def motorista():
+    return render_template("admin.html")
+
 if __name__ == "__main__":
     with app.app_context():
         if app.config['DEBUG']:

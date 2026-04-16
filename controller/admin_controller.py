@@ -205,7 +205,7 @@ def listarVeiculos():
         veiculos,erro = admin_model.getVeiculos()
         return jsonify(veiculos), 200
     except Exception as e:
-        traceback.print_exc()
+        # traceback.print_exc()
         return jsonify({'erro': str(e)}), 500
 
 

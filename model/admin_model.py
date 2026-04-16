@@ -53,7 +53,7 @@ class ErroValidacao(Exception):
 #-------------------------
 def getAdmin():
     admin  = Administradores.query.all()   
-    return [admin.to_dict() for admin in admins]
+    return [admin.to_dict() for admin in admin]
 
 def getAdminId(admin):
     admin = Administradores.query.get(admin)
@@ -66,7 +66,7 @@ def putAdminPorId(adminId, dados):
     admin = Administradores.query.get(adminId)
 
     if not admin:
-        raise AdminoNaoEncontrado
+        raise AdminNaoEncontrado
     
     admin.nome_usuario = dados.get("nome_usuario", admin.nome_usuario)
     admin.email = dados.get("email", admin.email)
@@ -178,7 +178,7 @@ def read_todos_motorista():
     return [motorista.to_dict() for motorista in motoristas], None
 
 def getUsuarios():
-    usuarios  = Usuarios.query.all()   
+    usuarios  = usuarios.query.all()   
     return [usuario.to_dict() for usuario in usuarios]
 
 def getVeiculos():
